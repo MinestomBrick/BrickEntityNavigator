@@ -10,11 +10,12 @@ import com.gufli.pathfinding.pathfinder.VectorNode;
 import com.gufli.pathfinding.pathfinder.examiner.BlockExaminer;
 import com.gufli.pathfinding.pathfinder.math.Vector;
 import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityCreature;
 
 import java.util.Set;
 
-public class MinestomPathfinder {
+public class MinestomNavigator {
 
     private final static int RANGE = 50;
     private final static AStarMachine<VectorNode, VectorGoal<VectorNode>, Path> ASTAR =
@@ -22,6 +23,7 @@ public class MinestomPathfinder {
 
     private final static int MAX_ITERATIONS = 10000;
     private final static int MAX_ITERATIONS_PER_TICK = 5000;
+    private final static float DISTANCE_MARGIN = 1f;
 
     private final MinestomBlockSource blockSource;
     private final EntityCreature entity;
@@ -31,7 +33,7 @@ public class MinestomPathfinder {
     private Path path;
     private int iterations;
 
-    public MinestomPathfinder(EntityCreature entity) {
+    public MinestomNavigator(EntityCreature entity) {
         this.entity = entity;
         this.agent = new MinestomAgent(entity);
         this.blockSource = new MinestomBlockSource(entity.getInstance());
@@ -56,11 +58,16 @@ public class MinestomPathfinder {
             return;
         }
 
+        Vector start = agent.position();
+        if ( path != null && path.currentVector().distance(start) < 1) {
+            start = path.currentVector();
+        }
+
         reset();
 
         Vector vec = new Vector(dest.x(), dest.y(), dest.z());
         VectorGoal<VectorNode> goal = new VectorGoal<>(vec, (float) 1);
-        VectorNode startnode = new VectorNode(agent.position());
+        VectorNode startnode = new VectorNode(start);
         state = ASTAR.stateFor(goal, startnode, createBlockExaminers(blockSource));
     }
 
@@ -72,11 +79,6 @@ public class MinestomPathfinder {
 
     public void update() {
         if (state == null) {
-            return;
-        }
-
-        if ( path != null && path.isFinished() ) {
-            reset();
             return;
         }
 
@@ -98,7 +100,25 @@ public class MinestomPathfinder {
             return;
         }
 
-        path.update(agent);
+        Vector from = agent.position();
+        Vector dest = path.destionation();
+        double dX = dest.blockX() - from.x();
+        double dZ = dest.blockY() - from.y();
+        double dY = dest.blockZ() - from.z();
+        double xzDistance = dX * dX + dZ * dZ;
+
+        if ( Math.abs(dY) < 1 && Math.sqrt(xzDistance) <= DISTANCE_MARGIN ) {
+            if ( path.isFinished() ) {
+                Vector velocity = dest.sub(from);
+                entity.setVelocity(new Vec(velocity.x(), velocity.y(), velocity.z()));
+                reset();
+                return;
+            }
+
+            path.next();
+        }
+
+        agent.moveTo(path.currentVector());
     }
 
 
