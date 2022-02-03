@@ -1,0 +1,25 @@
+
+dependencies {
+    implementation 'org.jetbrains:annotations:23.0.0'
+
+    implementation 'com.google.guava:guava:31.0.1-jre'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Jorisg"
+            url = uri("https://repo.jorisg.com/snapshots")
+            credentials(org.gradle.api.credentials.PasswordCredentials)
+        }
+    }
+
+    publications {
+        release(MavenPublication) {
+            from components.java
+            groupId = rootProject.group
+            artifactId = project.name
+            version = rootProject.version
+        }
+    }
+}
