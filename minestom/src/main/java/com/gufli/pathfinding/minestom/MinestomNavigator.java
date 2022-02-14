@@ -45,6 +45,10 @@ public class MinestomNavigator {
         );
     }
 
+    public MinestomAgent agent() {
+        return agent;
+    }
+
     public boolean isPathing() {
         return state != null && path != null && !path.isFinished();
     }
@@ -101,11 +105,11 @@ public class MinestomNavigator {
         }
 
         Vector from = agent.position();
-        Vector dest = path.destionation();
-        double dX = dest.blockX() - from.x();
-        double dZ = dest.blockY() - from.y();
-        double dY = dest.blockZ() - from.z();
-        double xzDistance = dX * dX + dZ * dZ;
+        Vector dest = path.currentVector();
+        double dX = dest.blockX() + .5 - from.x();
+        double dY = dest.blockY() + .5 - from.y();
+        double dZ = dest.blockZ() + .5 - from.z();
+        double xzDistance = (dX * dX) + (dZ * dZ);
 
         if ( Math.abs(dY) < 1 && Math.sqrt(xzDistance) <= DISTANCE_MARGIN ) {
             if ( path.isFinished() ) {

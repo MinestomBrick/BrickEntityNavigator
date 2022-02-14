@@ -1,4 +1,4 @@
-rootProject.name = 'BrickPathfinding'
+rootProject.name = 'BrickEntityNavigator'
 
 include 'common'
 include 'minestom'

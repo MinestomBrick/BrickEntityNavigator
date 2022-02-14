@@ -30,8 +30,8 @@ public class MinestomAgent implements Agent {
 
     @Override
     public void moveTo(Vector target) {
-        Vec vec = new Vec(target.blockX(), target.blockY(), target.blockZ());
-        double speed = .2f; //entity.getAttributeValue(Attribute.MOVEMENT_SPEED);
+        Vec vec = new Vec(target.blockX() + .5, target.blockY() + .5, target.blockZ() + .5);
+        double speed = entity.getAttributeValue(Attribute.MOVEMENT_SPEED);
 
         final Pos position = entity.getPosition();
         final double dx = vec.x() - position.x();
@@ -52,6 +52,14 @@ public class MinestomAgent implements Agent {
         // Prevent ghosting
         final var physicsResult = CollisionUtils.handlePhysics(entity, new Vec(speedX, speedY, speedZ));
         this.entity.refreshPosition(physicsResult.newPosition().withView(entity.getPosition().yaw(), entity.getPosition().pitch()));
+
+        if (position.y() < vec.y()) {
+            this.jump(1);
+        }
+    }
+
+    public void jump(float height) {
+        this.entity.setVelocity(entity.getVelocity().withY(2.5f * height));
     }
 
 }
