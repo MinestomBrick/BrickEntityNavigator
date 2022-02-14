@@ -91,11 +91,12 @@ public class AStarMachine<N extends AStarNode, G extends AStarGoal<N>, P extends
                 neighbour.parent = node;
             }
             if (maxIterations >= 0 && iterations++ >= maxIterations) {
-                node = (N) storage.allTimeBestNode();
-                if ( node == null ) {
-                    return null;
-                }
-                return (P) node.buildPath();
+//                node = (N) storage.allTimeBestNode();
+//                if ( node == null ) {
+//                    return null;
+//                }
+//                return (P) node.buildPath();
+                return null;
             }
         }
     }

@@ -42,7 +42,7 @@ public class VectorPath implements Path {
     }
 
     @Override
-    public Vector destionation() {
+    public Vector destination() {
         return path[path.length - 1].vector;
     }
 
@@ -67,6 +67,11 @@ public class VectorPath implements Path {
         }
 
         index++;
+    }
+
+    @Override
+    public int length() {
+        return path.length;
     }
 
     private record PathEntry(Vector vector, List<PathExecutor> executors) {

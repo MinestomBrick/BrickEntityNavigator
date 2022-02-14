@@ -53,36 +53,49 @@ public class MinecraftBlockExaminer extends MinestomExaminer {
             return PassableState.IGNORE;
         }
 
-//        if (pos.blockY() <= 0 || pos.blockY() >= 255) { // TODO new height limits
-//            return PassableState.UNPASSABLE;
-//        }
+        Block in = blockSource.type(pos);
+
+        if ( !canStandIn(in) ) {
+            return PassableState.UNPASSABLE;
+        }
 
         Block above = blockSource.type(pos.blockX(), pos.blockY() + 1, pos.blockZ());
         Block below = blockSource.type(pos.blockX(), pos.blockY() - 1, pos.blockZ());
-        Block in = blockSource.type(pos);
 
-        boolean canStand = canStandOn(below) || in.isLiquid() || below.isLiquid() || isClimbable(below);
-        if (!canStand) {
+        if ( in.isLiquid() || below.isLiquid() ) {
             return PassableState.UNPASSABLE;
         }
 
-        if ( isClimbable(in) && (isClimbable(above) || isClimbable(below)) ) {
-            point.addExecutor(new LadderClimber());
-        } else if ( !canStandIn(above) || !canStandIn(in) ) {
+        if ( !canStandOn(below) ) {
             return PassableState.UNPASSABLE;
         }
 
-        if (!canJumpOn(below)) {
-            if (point.parentPoint() == null) {
-                return PassableState.UNPASSABLE;
-            }
-
-            Vector parentPos = point.parentPoint().vector();
-            if ((parentPos.x() != pos.x() || parentPos.z() != pos.z())
-                    && pos.sub(point.parentPoint().vector()).y() == 1) {
-                return PassableState.UNPASSABLE;
-            }
+        if ( above.isSolid() ) { // TODO check for small and big entities through hitbox
+            return PassableState.UNPASSABLE;
         }
+
+//        boolean canStand = canStandOn(below) || in.isLiquid() || below.isLiquid() || isClimbable(below);
+//        if (!canStand) {
+//            return PassableState.UNPASSABLE;
+//        }
+//
+//        if ( isClimbable(in) && (isClimbable(above) || isClimbable(below)) ) {
+//            point.addExecutor(new LadderClimber());
+//        } else if ( !canStandIn(above) || !canStandIn(in) ) {
+//            return PassableState.UNPASSABLE;
+//        }
+//
+//        if (!canJumpOn(below)) {
+//            if (point.parentPoint() == null) {
+//                return PassableState.UNPASSABLE;
+//            }
+//
+//            Vector parentPos = point.parentPoint().vector();
+//            if ((parentPos.x() != pos.x() || parentPos.z() != pos.z())
+//                    && pos.sub(point.parentPoint().vector()).y() == 1) {
+//                return PassableState.UNPASSABLE;
+//            }
+//        }
 
         return PassableState.PASSABLE;
     }

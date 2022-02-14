@@ -9,6 +9,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.entity.pathfinding.Navigator;
 import net.minestom.server.utils.position.PositionUtils;
 
 public class MinestomAgent implements Agent {
@@ -30,8 +31,8 @@ public class MinestomAgent implements Agent {
 
     @Override
     public void moveTo(Vector target) {
-        Vec vec = new Vec(target.blockX() + .5, target.blockY() + .5, target.blockZ() + .5);
-        double speed = entity.getAttributeValue(Attribute.MOVEMENT_SPEED);
+        Vec vec = new Vec(target.blockX() + .5, target.blockY(), target.blockZ() + .5);
+        double speed = .15d; //entity.getAttributeValue(Attribute.MOVEMENT_SPEED);
 
         final Pos position = entity.getPosition();
         final double dx = vec.x() - position.x();
@@ -49,9 +50,15 @@ public class MinestomAgent implements Agent {
         final double speedY = dy * speed;
         final double speedZ = Math.sin(radians) * speed;
 
+        final float yaw = PositionUtils.getLookYaw(dx, dz);
+        final float pitch = PositionUtils.getLookPitch(dx, dy, dz);
+
         // Prevent ghosting
         final var physicsResult = CollisionUtils.handlePhysics(entity, new Vec(speedX, speedY, speedZ));
-        this.entity.refreshPosition(physicsResult.newPosition().withView(entity.getPosition().yaw(), entity.getPosition().pitch()));
+
+        // move entity
+        Pos finalpos = physicsResult.newPosition().withView(yaw, pitch); //.withView(entity.getPosition().yaw(), entity.getPosition().pitch());
+        this.entity.refreshPosition(finalpos);
 
         if (position.y() < vec.y()) {
             this.jump(1);

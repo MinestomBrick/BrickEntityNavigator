@@ -12,9 +12,11 @@ public interface Path {
 
     Vector currentVector();
 
-    Vector destionation();
+    Vector destination();
 
     void next();
+
+    int length();
 
 
 

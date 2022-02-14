@@ -125,21 +125,24 @@ public class VectorNode extends AStarNode implements PathPoint {
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
-                    if (x == 0 && y == 0 && z == 0)
+                    if ( x == 0 && y == 0 && z == 0 ) {
                         continue;
+                    }
+
+                    int modX = vector.blockX() + x;
                     int modY = vector.blockY() + y;
-//                    if (modY < 0 || modY > 255) {
-//                        continue;
-//                    }
-                    Vector mod = new Vector(vector.x() + x, modY, vector.z() + z);
-                    if (mod.equals(vector))
-                        continue;
-                    if (x != 0 && z != 0) {
-                        if (!isPassable(point.createAtOffset(new Vector(vector.x() + x, modY, vector.z())))
-                                || !isPassable(point.createAtOffset(new Vector(vector.x(), modY, vector.z() + z)))) {
+                    int modZ = vector.blockZ() + z;
+
+                    Vector mod = new Vector(modX, modY, modZ);
+
+                    // diagonal check
+                    if ( x != 0 && z != 0 ) {
+                        if ( !isPassable(point.createAtOffset(new Vector(modX, modY, vector.z())))
+                                || !isPassable(point.createAtOffset(new Vector(vector.x(), modY, modZ)))) {
                             continue;
                         }
                     }
+
                     neighbours.add(point.createAtOffset(mod));
                 }
             }
@@ -153,7 +156,7 @@ public class VectorNode extends AStarNode implements PathPoint {
             BlockExaminer.PassableState state = examiner.isPassable(mod);
             if (state == BlockExaminer.PassableState.IGNORE)
                 continue;
-            passable |= state == BlockExaminer.PassableState.PASSABLE;
+            passable = state == BlockExaminer.PassableState.PASSABLE;
         }
         return passable;
     }
