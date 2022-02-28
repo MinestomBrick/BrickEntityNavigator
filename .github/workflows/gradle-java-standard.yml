@@ -1,0 +1,11 @@
+name: Gradle test, build and upload artifact
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    uses: MinestomBrick/.github/.github/workflows/java-gradle-test.yml@main
